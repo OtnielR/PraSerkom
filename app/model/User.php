@@ -1,7 +1,8 @@
 <?php
 
-class User {
-    
+class User
+{
+
     private Database $db;
 
     public function __construct(Database $db)
@@ -9,11 +10,17 @@ class User {
         $this->db = $db;
     }
 
-    public function getUserByEmail(string $email){
-        $query = "SELECT * FROM users WHERE email='{$email}'";
-        $result = $this->db->conn->query($query);
+    public function getUserByEmail(string $email)
+    {
+        $stmt = $this->db->conn->prepare("SELECT * FROM users WHERE email=?");
 
-        if (!$result ) {
+        $stmt->bind_param("s", $email);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if (!$result) {
             return false;
         }
 
@@ -22,20 +29,20 @@ class User {
         return $user;
     }
 
-    public function create(string $username, string $email, string $password): bool{
+    public function create(string $username, string $email, string $password): bool
+    {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-        $query = "INSERT INTO users (username, email, password) VALUE ('{$username}', '{$email}', '{$hashedPassword}');";
+        $stmt = $this->db->conn->prepare("INSERT INTO users (username, email, password) VALUE (?, ?, ?)");
 
-        $result = $this->db->conn->query($query);
-
-
+        $stmt->bind_param("sss", $username, $email, $hashedPassword);
 
 
-        if (!$result) {
-            return false; 
-        } 
-        
-        return true;
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 }
+

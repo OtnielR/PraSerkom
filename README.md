@@ -1,5 +1,4 @@
-## Sistem Manajemen Tiket Pemesanan & Dasbor (Ticket Management & Dashboard System)
-
+# Sistem Manajemen Tiket Pemesanan & Dasbor (Ticket Management & Dashboard System)
 
 ---
 
@@ -21,18 +20,18 @@ Aplikasi dikonfigurasi untuk secara otomatis memeriksa dan membuat tabel basis d
 Perbarui kredensial basis data Anda di `app/core/config.php`
 
 ```php
--- Change this based on your own credentials
+-- Ubah data-data di bawah berdasarkan kredensial database anda
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'food_db');
 
--- Change this if you want different default admin account
+-- Ini adalah standar dari akun user admin, boleh di ubah jika di ingin kan
 define("DEFAULT_ADMIN_USERNAME", "admin");
 define("DEFAULT_ADMIN_GMAIL", "admin@gmail.com");
 define("DEFAULT_ADMIN_PASSWORD", "admin");
 
--- Change this based on your folder name
+-- Ubah ini berdasarkan dengan nama folder dimana anda menyimpan projeknya
 define("__BASEURL__", "/PraserkomDennis");
 
 ```
@@ -91,16 +90,12 @@ C:\laragon\www\nama-proyek-anda
 
 ```
 
-3. Nyalakan **Apache** dan **MySQL** dari Panel Kontrol Laragon.
 
 ### 2. Memulai Aplikasi
 
-1. Buka **HeidiSQL** atau **phpMyAdmin** dari Laragon dan buat basis data kosong secara manual dengan nama `food_db` (atau sesuaikan dengan nama di berkas `config.php` Anda).
+1. Buka **HeidiSQL** atau **phpMyAdmin** dari Laragon dan buat basis data kosong secara manual dengan nama `event` (atau sesuaikan dengan nama di berkas `config.php` Anda).
 2. Arahkan peramban (browser) Anda ke URL proyek:
-* **Laragon Virtual Host:** `[http://nama-proyek-anda.test](http://nama-proyek-anda.test)`
-* **URL Standar:** `http://localhost/nama-proyek-anda`
-
-
+    * **URL Standar:** `http://localhost/nama-proyek-anda`
 3. Pada pemuatan halaman pertama, pemeriksaan inisialisasi basis data akan berjalan secara otomatis dan menyiapkan semua tabel yang diperlukan. Permintaan berikutnya akan melewati pembuatan tabel jika sudah ada.
 
 ---
@@ -109,7 +104,7 @@ C:\laragon\www\nama-proyek-anda
 
 ### 1. Autentikasi
 
-* Kunjungi halaman masuk (`/view/login.php` atau rute utama) untuk masuk.
+* Kunjungi halaman masuk (`/view/pages/login.php` atau rute utama) untuk masuk.
 * Lalu login menggunakan data default yang sudah di siap kan dalam file `config.php`
 * Akhiri sesi dengan aman menggunakan `logout.php`.
 

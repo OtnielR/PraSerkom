@@ -24,8 +24,13 @@ class Event
 
     public function getEventById(string $id)
     {
-        $query = "SELECT * FROM events WHERE id={$id}";
-        $result = $this->db->conn->query($query);
+        $stmt = $this->db->conn->prepare("SELECT * FROM events WHERE id=?");
+
+        $stmt->bind_param("s", $id);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
 
         if (!$result) {
             return false;
@@ -36,40 +41,37 @@ class Event
 
     public function create(string $title, string $category, int $ticket_price, string $description, string|null $image): bool
     {
-        $query = "INSERT INTO events (title, category, ticket_price, description, image) VALUE ('{$title}', '{$category}', {$ticket_price}, '{$description}', '{$image}');";
+        $stmt = $this->db->conn->prepare("INSERT INTO events (title, category, ticket_price, description, image) VALUE (?, ?, ?, ?, ?)");
 
-        $result = $this->db->conn->query($query);
+        $stmt->bind_param("ssiss", $title, $category, $ticket_price, trim($description), $image);
 
-        if (!$result) {
-            return false;
+        if ($stmt->execute()) {
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     public function update(string $eventId, string $title, string $category, int $ticket_price, string $description, string|null $image): bool
     {
-        $query = "UPDATE events SET title='{$title}', category='{$category}', ticket_price={$ticket_price}, description='{$description}', image='{$image}' WHERE id={$eventId}";
+        $stmt = $this->db->conn->prepare("UPDATE events SET title=?, category=?, ticket_price=?, description=?, image=? WHERE id=?");
 
-        $result = $this->db->conn->query($query);
+        $stmt->bind_param("ssisss", $title, $category, $ticket_price, trim($description), $image, $eventId);
 
-        if (!$result) {
-            return false;
+        if ($stmt->execute()) {
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     public function delete(string $eventId)
     {
-        $query = "DELETE FROM events WHERE id={$eventId}";
-        $result = $this->db->conn->query($query);
+        $stmt = $this->db->conn->prepare("DELETE FROM events WHERE id=?");
 
-        if (!$result) {
-            return false;
+        $stmt->bind_param("s", $eventId);
+
+        if ($stmt->execute()) {
+            return true;
         }
-
-        return true;
+        return false;
     }
 }
-

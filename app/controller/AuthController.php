@@ -7,7 +7,8 @@ require_once(__DIR__ . "/../core/database.php");
 require_once(__DIR__ . "/../core/auth.php");
 require_once(__DIR__ . "/../model/User.php");
 
-class AuthController extends Controller {
+class AuthController extends Controller
+{
 
     private Database $db;
     private User $userModel;
@@ -20,7 +21,8 @@ class AuthController extends Controller {
     }
 
 
-    public function login() {
+    public function login()
+    {
         Auth::requireGuest();
         $error = "";
 
@@ -36,21 +38,20 @@ class AuthController extends Controller {
 
                     header("Location: " . __BASEURL__ . "/view/dashboard");
                 }
-
             } else {
 
-            $error = "User not found";
+                $error = "User not found, password or email wrong";
             }
-
-            
         }
 
-        return $this->view("components/user-form", ["action" => "login"]);
+        return $this->view("components/user-form", ["action" => "login", "error" => $error]);
     }
 
-    public function logout() {
+    public function logout()
+    {
         Auth::logout();
 
         header("Location: " . __BASEURL__);
     }
 }
+

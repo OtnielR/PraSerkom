@@ -99,6 +99,7 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="number"],
+input[type="file"],
 textarea,
 select {
     width: 100%;
@@ -229,4 +230,10 @@ td img {
     display: flex;
     gap: .75rem;
     justify-content: space-between;
+}
+
+.error-message {
+    font-size: .9rem;
+    font-weight: light;
+    color: red;
 }

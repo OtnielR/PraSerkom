@@ -25,9 +25,13 @@ class Order
 
     public function getOrderDetailsByOrderId(int|string $orderId)
     {
-        $query = "SELECT * FROM order_details INNER JOIN events ON order_details.event_id = events.id WHERE order_id={$orderId}";
+        $stmt = $this->db->conn->prepare("SELECT * FROM order_details INNER JOIN events ON order_details.event_id = events.id WHERE order_id=?");
 
-        $result = $this->db->conn->query($query);
+        $stmt->bind_param("s", $orderId);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
 
         if (!$result) {
             return false;
@@ -38,22 +42,28 @@ class Order
 
     public function create(string $customer_name, string $customer_email, int $total_price): false|int
     {
-        $query = "INSERT INTO orders (customer_name, customer_email, total_price, status) VALUE ('{$customer_name}', '{$customer_email}', {$total_price}, 'Pending');";
+        $stmt = $this->db->conn->prepare("INSERT INTO orders (customer_name, customer_email, total_price, status) VALUE (?, ?, ?, 'Pending')");
 
-        $result = $this->db->conn->query($query);
+        $stmt->bind_param("ssi", $customer_name, $customer_email, $total_price);
+
+        $stmt->execute();
+
+        $result = $this->db->conn->insert_id;
 
         if (!$result) {
             return false;
         }
 
-        return $this->db->conn->insert_id;
+        return $result;
     }
 
     public function updateStatus(int|string $orderId, string $status)
     {
-        $query = "UPDATE orders SET status='{$status}' WHERE id={$orderId}";
+        $stmt = $this->db->conn->prepare("UPDATE orders SET status=? WHERE id=?");
 
-        $result = $this->db->conn->query($query);
+        $stmt->bind_param("ss", $status, $orderId);
+
+        $result = $stmt->get_result();
 
         if (!$result) {
             return false;
@@ -62,4 +72,3 @@ class Order
         return true;
     }
 }
-

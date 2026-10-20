@@ -10,7 +10,7 @@ $event = isset($event) ? $event : [];
     <form action="" class="form" method="post" enctype="multipart/form-data">
 
         <?php if (isset($event) && $event != []): ?>
-            <input type="hidden" name="event_id" value="<?= $event[" id"] ?>">
+            <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
         <?php endif; ?>
         <div class="form-title">
             Event Form
@@ -18,7 +18,7 @@ $event = isset($event) ? $event : [];
 
         <div class="form-input">
             <label for="title">Title: </label>
-            <input type="text" name="title" required value="<?= isset($event[" title"]) ? $event['title'] : '' ?>">
+            <input type="text" name="title" required value="<?= isset($event['title']) ? $event['title'] : '' ?>">
         </div>
 
         <div class="form-input">
@@ -32,14 +32,14 @@ $event = isset($event) ? $event : [];
 
         <div class="form-input">
             <label for="ticket_price">Ticket Price: </label>
-            <input type="number" name="ticket_price" required value="<?= isset($event[" ticket_price"]) ?
+            <input type="number" name="ticket_price" required value="<?= isset($event['ticket_price']) ?
                                                                             $event['ticket_price'] : '' ?>">
         </div>
 
         <div class="form-input">
             <label for="description">Description: </label>
             <textarea name="description" required>
-                <?= isset($event['description']) ? $event['description'] : '' ?>
+                <?= isset($event['description']) ? trim($event['description']) : '' ?>
             </textarea>
         </div>
 

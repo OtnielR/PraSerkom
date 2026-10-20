@@ -9,7 +9,8 @@ require_once(__DIR__ . "/../model/User.php");
 require_once(__DIR__ . "/../model/Event.php");
 require_once(__DIR__ . "/../utils/FileUtils.php");
 
-class EventController extends Controller {
+class EventController extends Controller
+{
 
     private Database $db;
     private User $userModel;
@@ -25,7 +26,8 @@ class EventController extends Controller {
         $this->eventModel = new Event($this->db);
     }
 
-    public function create() {
+    public function create()
+    {
         Auth::requireAuth();
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -46,10 +48,11 @@ class EventController extends Controller {
             header("Location: " . __BASEURL__ . "/view/dashboard");
         }
 
-        $this->view("components/event-form", [] );
+        $this->view("components/event-form", []);
     }
 
-    public function update() {
+    public function update()
+    {
         Auth::requireAuth();
         $event = null;
         $eventId = null;
@@ -58,6 +61,10 @@ class EventController extends Controller {
             $eventId = $_GET["event_id"];
 
             $event = $this->eventModel->getEventById($eventId);
+
+            if (!$event) {
+                header("Location: " . __BASEURL__ . "/view/dashboard/");
+            }
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -82,22 +89,18 @@ class EventController extends Controller {
         }
 
 
-        $this->view("components/event-form", ["event" => $event] );
+        $this->view("components/event-form", ["event" => $event]);
     }
 
-
-
-
-    public function delete() {
+    public function delete()
+    {
+        Auth::requireAuth();
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $eventId = $_GET["event_id"];
 
             $this->eventModel->delete($eventId);
-
         }
 
         header("Location: " . __BASEURL__ . "/view/dashboard");
-
     }
-
 }
