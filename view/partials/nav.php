@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -8,12 +8,12 @@ if (session_status() == PHP_SESSION_NONE) {
 
 <nav>
 
+    <div>
+        <a href="<?= __BASEURL__ ?>">Ticket Box</a>
+    </div>
+    <?php if (isset($_SESSION["is_logged_in"]) && $_SESSION["is_logged_in"] == true): ?>
         <div>
-            <a href="<?= __BASEURL__ ?>">Ticket Box</a>
-        </div>
-        <?php if (isset($_SESSION["is_logged_in"]) && $_SESSION["is_logged_in"] == true): ?>
-        <div>
-            <a href="<?= __BASEURL__ ?>/view/dashboard">Dashboard</a>
+            <a href="<?= __BASEURL__ ?>/view/dashboard">Event List</a>
             <a href="<?= __BASEURL__ ?>/view/dashboard/event-form.php">Event Form</a>
             <a href="<?= __BASEURL__ ?>/view/dashboard/order-list.php">Order List</a>
 
@@ -21,10 +21,10 @@ if (session_status() == PHP_SESSION_NONE) {
         <div>
             <a href="<?= __BASEURL__ ?>/view/pages/logout.php">Logout</a>
         </div>
-        <?php else: ?>
+    <?php else: ?>
         <div>
             <a href="<?= __BASEURL__ ?>/view/pages/login.php">Login</a>
         </div>
-        <?php endif; ?>
+    <?php endif; ?>
 
 </nav>

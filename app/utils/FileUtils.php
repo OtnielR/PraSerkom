@@ -1,10 +1,12 @@
 <?php
 
-class FileUtils {
+class FileUtils
+{
     private static array $allowedImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
     private static int $megabyte = 1024 * 1024;
 
-    public static function storeImage(string $file): array {
+    public static function storeImage(string $file): array
+    {
         if (isset($_FILES[$file]) && $_FILES[$file]["error"] == UPLOAD_ERR_OK) {
             $fileTmpPath = $_FILES[$file]["tmp_name"];
             $fileName = $_FILES[$file]["name"];
@@ -23,17 +25,20 @@ class FileUtils {
             $newFileName = uniqid("img_", true) . "." . $fileExtension;
             $relativePathFile = "/public/uploads/" . $newFileName;
 
+            if (is_dir($uploadDirectory)) {
+                mkdir($uploadDirectory, 0755, true);
+            }
+
             $destination = $uploadDirectory . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $destination)) {
                 return ["status" => "success", "message" => "File moved successfully", "path" => $relativePathFile];
             }
-            
-            return ["status" => false, "message" => "Error moving file"];
 
+            return ["status" => false, "message" => "Error moving file"];
         }
 
         return ["status" => false, "message" => "File Null"];
-
     }
 }
+
