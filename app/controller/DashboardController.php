@@ -8,14 +8,12 @@ require_once(__DIR__ . "/../core/auth.php");
 require_once(__DIR__ . "/../model/User.php");
 require_once(__DIR__ . "/../model/Event.php");
 require_once(__DIR__ . "/../model/Order.php");
-class DashboardController extends Controller {
+class DashboardController extends Controller
+{
 
     private Database $db;
     private User $userModel;
-
     private Event $eventModel;
-
-
     private Order $orderModel;
 
     public function __construct()
@@ -23,12 +21,12 @@ class DashboardController extends Controller {
         $this->db = new Database();
         $this->userModel = new User($this->db);
         $this->eventModel = new Event($this->db);
-        
         $this->orderModel = new Order($this->db);
     }
 
-    public function index() {
-    Auth::requireAuth();
+    public function index()
+    {
+        Auth::requireAuth();
 
         $events = $this->eventModel->getAll();
 
@@ -36,23 +34,26 @@ class DashboardController extends Controller {
         $this->view("components/event-table", ["events" => $events]);
     }
 
-    public function orderList() {
-    Auth::requireAuth();
-        
-    if ($_SERVER["REQUEST_METHOD"] == "POST")  {
-        $status = trim($_POST["status"]);
-        $orderId = trim($_POST["order_id"]);
+    public function orderList()
+    {
+        Auth::requireAuth();
+        $orders = [];
 
-        $this->orderModel->updateStatus($orderId, $status);
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $status = trim($_POST["status"]);
+            $orderId = trim($_POST["order_id"]);
 
-    }
+            $this->orderModel->updateStatus($orderId, $status);
+        }
+        $rawOrders = $this->orderModel->getAll();
 
-        $orders = $this->orderModel->getAll();
+        while ($order = $rawOrders->fetch_assoc()) {
+            $orderDetails = $this->orderModel->getOrderDetailsByOrderId($order["id"]);
+            array_push($orders, ["order" => $order, "details" => $orderDetails]);
+        }
 
         $this->view("components/header", ["title" => "Order List", "subtitle" => "This was where you see all the order that running"]);
         $this->view("components/order-table", ["orders" => $orders]);
     }
-
-
-
 }
+

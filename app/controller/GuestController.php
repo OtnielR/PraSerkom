@@ -9,7 +9,8 @@ require_once(__DIR__ . "/../model/Order.php");
 require_once(__DIR__ . "/../model/OrderDetails.php");
 require_once(__DIR__ . "/../model/Event.php");
 
-class GuestController extends Controller {
+class GuestController extends Controller
+{
 
     private Database $db;
     private User $userModel;
@@ -29,30 +30,31 @@ class GuestController extends Controller {
         $this->orderDetailModel = new OrderDetail($this->db);
     }
 
-    public function index() {
+    public function index()
+    {
         $events = $this->eventModel->getAll();
 
         $this->handleCart();
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $eventId = $_SESSION["cart"]["event_id"];
-            $title = $_SESSION["cart"]["title"];
-            $ticket_price = $_SESSION["cart"]["ticket_price"];
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION["cart"])) {
+            $orders = $_SESSION["cart"];
             $customer_name = $_POST["customer_name"];
-            $customer_email= $_POST["customer_email"];
-            $quantity = $_POST["quantity"];
+            $customer_email = $_POST["customer_email"];
 
-            $total_price = (int) ($ticket_price *  $quantity);
+            $total_price = 0;
+
+            foreach ($orders as $key => $value) {
+                $total_price += $value["quantity"] * $value["ticketPrice"];
+            }
 
             $order_id = $this->orderModel->create($customer_name, $customer_email, $total_price);
 
-            if ($order_id) {
-                $this->orderDetailModel->create($order_id, $eventId, $quantity, $total_price);
+            foreach ($orders as $key => $value) {
+                $this->orderDetailModel->create($order_id, $key, $value["quantity"], $value["ticketPrice"] * $value["quantity"]);
             }
-
             unset($_SESSION["cart"]);
 
-
+            header("Location: " . __BASEURL__);
         }
 
         $this->view("components/header", ["title" => "Ticket Box", "subtitle" => "This was where you order a ticket for an event"]);
@@ -60,20 +62,20 @@ class GuestController extends Controller {
         echo "<div class='grid'>";
 
         while ($event = $events->fetch_assoc()) {
-            $this->view("/components/event-card", ["event" => $event]);
+            $quantity = isset($_SESSION["cart"][$event["id"]]) ? $_SESSION["cart"][$event["id"]]["quantity"] : 0;
+            $this->view("/components/event-card", ["event" => $event, "quantity" => $quantity]);
         }
 
         echo "</div>";
 
-
-        if (isset($_SESSION["cart"]["event_id"])) {
-            $this->view("components/order-form", ["image" => $_SESSION["cart"]["image"], "title" => $_SESSION["cart"]["title"], "ticket_price" => $_SESSION["cart"]["ticket_price"]]);
+        if (isset($_SESSION["cart"]) && $_SESSION["cart"] !== []) {
+            $this->view("components/order-form", ["orders" => $_SESSION["cart"]]);
         }
-
     }
 
 
-    public function handleCart() {
+    public function handleCart()
+    {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
@@ -91,12 +93,31 @@ class GuestController extends Controller {
             $title = $_GET["title"];
             $ticketPrice = $_GET["ticket_price"];
             $image = $_GET["image"];
+            $action = $_GET["action"];
 
-            $_SESSION["cart"]["event_id"] = $eventId;
-            $_SESSION["cart"]["title"] = $title;
-            $_SESSION["cart"]["ticket_price"] = $ticketPrice;
-            $_SESSION["cart"]["image"] = $image;
 
+            switch ($action) {
+                case "add":
+                    if (isset($_SESSION["cart"][$eventId]["quantity"]) && $_SESSION["cart"][$eventId]["quantity"] >= 1) {
+                        $_SESSION["cart"][$eventId]["quantity"]++;
+                    } else {
+                        $_SESSION["cart"][$eventId]["quantity"] = 1;
+                        $_SESSION["cart"][$eventId]["title"] = $title;
+                        $_SESSION["cart"][$eventId]["ticketPrice"] = $ticketPrice;
+                        $_SESSION["cart"][$eventId]["image"] = $image;
+                    }
+                    break;
+
+                case "decrease":
+                    if (isset($_SESSION["cart"][$eventId]["quantity"]) && $_SESSION["cart"][$eventId]["quantity"] > 1) {
+                        $_SESSION["cart"][$eventId]["quantity"]--;
+                    } else {
+                        unset($_SESSION["cart"][$eventId]);
+                    }
+                    break;
+            }
+
+            header("Location: " . __BASEURL__);
         }
     }
 }
